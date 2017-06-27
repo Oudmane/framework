@@ -17,7 +17,7 @@ class Server {
          * @name Server#server
          * @type http.Server
          */
-        this.server = (options ? https : http).createServer(options)
+        this.http = (options ? https : http).createServer(options)
 
         // Initiate the WebSocket Server
         /**
@@ -25,10 +25,10 @@ class Server {
          * @type Websocket
          */
         this.websocket = new Websocket({
-            server: this.server
+            server: this.http
         })
 
-        this.options = options
+        this.options = options || {}
     }
 
     /**
@@ -38,8 +38,10 @@ class Server {
      * @returns {Promise}
      */
     start(port = 80, hostname = '0.0.0.0') {
+        this.options.port = port
+        this.options.hostname = hostname
         return new Promise((resolve, reject) => {
-            this.server.listen(port, hostname, () => {
+            this.http.listen(port, hostname, () => {
                 resolve()
             })
         })
