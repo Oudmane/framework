@@ -4,7 +4,7 @@ import cookie from 'cookie'
 import multipart from 'parse-multipart'
 
 class Request {
-    constructor(request) {
+    constructor(request, socket = false) {
         this.parseURL(request.url)
         this.method = request.method
         this.headers = request.headers
@@ -15,6 +15,7 @@ class Request {
         this.body = null
         this.bodyObject = {}
         this.files = []
+        this.socket = socket
     }
     parseURL(url) {
         url = URL.parse(url, true)

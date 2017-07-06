@@ -1,13 +1,14 @@
 import Server from './Application/Server'
+import Renderer from './Application/Renderer'
 import fs from 'fs'
 import path from 'path'
+import http from 'http'
 
 const trigger = (event, params) => {
         return Promise.all(
             Application.triggers[event].map(e => new Promise(
                 (resolve, reject) => {
                     Promise.resolve(e(...params)).then(resolve).catch((error) => {
-                        error.unshift(event)
                         reject(error)
                     })
                 }
@@ -57,8 +58,28 @@ const trigger = (event, params) => {
 let components = null,
     modules = null
 
+/**
+ * @class Application
+ */
 class Application {
     constructor() {
+
+        /**
+         * @name Application#http
+         * @type {{request: http.ClientRequest, response: http.ServerResponse}}
+         */
+        this.http = {
+            /**
+             * @type {http.ClientRequest}
+             * @name Application#http#request
+             */
+            request: null,
+            /**
+             * @type {http.ServerResponse}
+             * @name Application#http#request
+             */
+            response: null
+        }
 
     }
     initiate(authorization) {
@@ -132,6 +153,9 @@ class Application {
 
         })
     }
+    render(payload, socket = false) {
+        return this.constructor.Renderer.render(payload, socket)
+    }
 
     static loadComponents(componentsDir) {
         return new Promise(resolve => {
@@ -175,5 +199,6 @@ triggers.forEach(trigger => {
 })
 
 Application.Server = Server
+Application.Renderer = Renderer
 
 export default Application

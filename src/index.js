@@ -1,16 +1,9 @@
 import Server from './Server'
 import Application from './Application'
+import Entity from './Entity'
 
 export {
-    /**
-     * @class
-     * @type Server
-     */
     Server,
-
-    /**
-     * @class
-     * @type Server
-     */
-    Application
+    Application,
+    Entity
 }

@@ -1,6 +1,7 @@
 import _Server from '../Server'
 import Application from '../Application'
 import Request from './Request'
+import http from 'http'
 
 const getAuthorizationCode = (request) => {
     return request.headers.authorization || (() => {
@@ -28,57 +29,108 @@ class Server extends _Server {
         })
 
         // When the server gets a HTTP request
-        this.http.on('request', this.request)
+        this.http.on('request', (request, response) => {
+
+            this.request(request, response)
+
+        })
 
         // When the server gets a WebSocket connection
-        this.websocket.on('connection', (connection) => {
-            this.request(connection.upgradeReq, connection, true)
+        this.websocket.on('connection', (connection, request) => {
+
+            this.request(request, connection, true)
+
         })
     }
+
+    /**
+     *
+     * @param  {http.ClientRequest} request
+     * @param {http.ServerResponse|http.IncomingMessage} response
+     * @param {boolean} [socket=false]
+     */
     request(request, response, socket = false) {
 
+        /**
+         *
+         * @type {Application}
+         */
         let application = new Application(),
-            authorization = (this.constructor.getAuthorizationCode || getAuthorizationCode)(request),
-            promise = Promise.resolve()
+            /**
+             * @type {string}
+             */
+            authorization = (this.constructor.getAuthorizationCode || getAuthorizationCode)(request)
 
         application.http = {
             request,
             response
         }
 
-        promise = promise.then(() => new Promise((resolve, reject) => {
+        application.initiate(authorization).then(() => {
 
-            Promise.all([
+            if(socket) {
 
+                response.on('message', message => {
 
-                // Initialise
-                application.initiate(authorization),
+                    message = JSON.parse(message)
 
-                // Build request
-                new Promise((resolve, reject) => {
+                    let appRequest = new Request(request, true)
 
-                    let body = [],
-                        appRequest = new Request(request)
+                    appRequest.append(message)
 
-                    request.on('data', chunk => body.push(chunk))
-
-                    request.on('end', () => {
-
-                        appRequest.parseBody(Buffer.concat(body).toString(), request.headers['content-type'])
-
-                        resolve(appRequest)
-
+                    this.process({
+                        application,
+                        request: appRequest,
+                        socket
                     })
 
                 })
 
-            ]).then(resolve).catch(reject)
+            } else {
 
-        }))
+                let body = [],
+                    appRequest = new Request(request)
 
+                request.on('data', chunk => body.push(chunk))
+
+                request.on('end', () => {
+
+                    appRequest.parseBody(Buffer.concat(body).toString(), request.headers['content-type'])
+
+                    this.process({
+                        application,
+                        request: appRequest,
+                        socket
+                    })
+
+                })
+
+            }
+
+        }).catch(error => {
+
+            console.log(error)
+
+            if(socket) {
+
+                response.send('Error')
+                response.terminate()
+
+            } else {
+
+                response.end('Error')
+
+            }
+
+        })
+
+    }
+    process({application, request, socket}) {
+
+        let promise = Promise.resolve(request)
 
         // Route
-        promise = promise.then(([, request]) => new Promise((resolve, reject) => {
+        promise = promise.then(request => new Promise((resolve, reject) => {
 
             application.route(request).then(resolve).catch(reject)
 
@@ -98,21 +150,47 @@ class Server extends _Server {
         // Render
         promise = promise.then(payload => new Promise((resolve, reject) => {
 
-            resolve(JSON.stringify(payload, null, 4))
+            application.render(payload, socket).then(resolve)
 
         }))
 
 
         // Pipe
+        if(socket)
+
+            promise.then(pipe => {
+
+                application.http.response.send(pipe)
+
+            }).catch(error => {
+
+                console.log(error)
+                application.http.response.send('Error')
+
+            })
+
+        else
+
+            promise.then(pipe => {
+
+                let {
+                    body,
+                    status,
+                    headers
+                } = pipe
+
+                application.http.response.writeHead(status, headers)
+
+                body.pipe(application.http.response)
 
 
+            }).catch(error => {
 
-        promise.then(pipe => {
-            response.end(pipe)
-        }).catch(error => {
-            console.log(error)
-            response.end('Error')
-        })
+                console.log(error)
+                application.http.response.end('Error')
+
+            })
+
     }
 }
 
