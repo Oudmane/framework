@@ -30,6 +30,8 @@
     "parse-multipart": "^1.0.4"
   },
   "dependencies": {
+    "mongodb": "^2.2.30",
+    "redis": "^2.7.1",
     "ws": "^3.0.0"
   }
 }

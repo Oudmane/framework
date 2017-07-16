@@ -17,8 +17,8 @@ const trigger = (event, params) => {
     },
     loadRoutesAndTriggers = (Component, component, task) => {
         routes.forEach(trigger => {
-            if(Component[task][trigger])
-                if(Array.isArray(Component[task][trigger]))
+            if (Component[task][trigger])
+                if (Array.isArray(Component[task][trigger]))
                     Component[task][trigger].forEach(route => {
                         Application.routes.push({
                             component,
@@ -34,8 +34,8 @@ const trigger = (event, params) => {
                     })
         })
         triggers.forEach(trigger => {
-            if(Component[task][trigger])
-                if(Array.isArray(Component[task][trigger]))
+            if (Component[task][trigger])
+                if (Array.isArray(Component[task][trigger]))
                     Component[task][trigger].forEach(callback => {
                         Application.triggers[trigger].push(callback)
                     })
@@ -82,6 +82,7 @@ class Application {
         }
 
     }
+
     initiate(authorization) {
         return new Promise((resolve, reject) => {
             trigger('beforeInitiate', [authorization, this]).then(
@@ -91,13 +92,14 @@ class Application {
             ).then(resolve).catch(reject)
         })
     }
+
     route(request = {}) {
         return new Promise((resolve, reject) => {
 
-            if(Application.routes.length)
+            if (Application.routes.length)
                 Promise.race(Application.routes.map(route => new Promise((resolve, reject) => {
                     Promise.resolve(route.uri.test(request.path)).then(isRouted => {
-                        if(isRouted)
+                        if (isRouted)
                             resolve({
                                 request,
                                 ...route
@@ -111,6 +113,7 @@ class Application {
 
         })
     }
+
     load(route) {
         return new Promise((resolve, reject) => {
 
@@ -125,13 +128,13 @@ class Application {
 
                     return new Promise((resolve, reject) => {
 
-                        if(!components)
+                        if (!components)
                             reject('Components unloaded')
 
-                        else if(!components[component])
+                        else if (!components[component])
                             reject('Component not found')
 
-                        else if(!components[component][task])
+                        else if (!components[component][task])
                             reject('task not found')
 
                         else
@@ -153,6 +156,7 @@ class Application {
 
         })
     }
+
     render(payload, socket = false) {
         return this.constructor.Renderer.render(payload, socket)
     }
@@ -163,20 +167,20 @@ class Application {
             fs.readdirSync(componentsDir).forEach(component => {
                 let componentDir = path.join(componentsDir, component),
                     Component = {}
-                if(fs.statSync(componentDir).isDirectory()) {
+                if (fs.statSync(componentDir).isDirectory()) {
                     let controllerFile = path.join(componentDir, 'controller.js'),
                         tasksDir = path.join(componentDir, 'tasks')
-                    if(fs.existsSync(controllerFile)) {
+                    if (fs.existsSync(controllerFile)) {
                         Component.default = require(controllerFile).default
                         loadRoutesAndTriggers(Component, component, 'default')
 
                     }
-                    if(fs.existsSync(tasksDir))
+                    if (fs.existsSync(tasksDir))
                         fs.readdirSync(tasksDir).forEach(task => {
                             let taskDir = path.join(tasksDir, task)
-                            if(fs.statSync(componentDir).isDirectory()) {
+                            if (fs.statSync(componentDir).isDirectory()) {
                                 let taskFile = path.join(taskDir, 'controller.js')
-                                if(fs.existsSync(taskFile)) {
+                                if (fs.existsSync(taskFile)) {
                                     Component[task] = require(taskFile).default
                                     loadRoutesAndTriggers(Component, component, task)
                                 }
@@ -185,7 +189,7 @@ class Application {
                     components[component] = Component
                 }
             })
-            console.log(components)
+
             resolve(components)
         })
     }

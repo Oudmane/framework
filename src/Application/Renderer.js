@@ -2,9 +2,9 @@ import {Readable} from 'stream'
 
 class Renderer {
     static render({body, status = 200, headers = {}}, socket = false) {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
 
-            if(socket)
+            if (socket)
                 resolve(body)
 
             else {

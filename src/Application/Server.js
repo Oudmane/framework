@@ -5,16 +5,16 @@ import http from 'http'
 
 const getAuthorizationCode = (request) => {
     return request.headers.authorization || (() => {
-        let authorization = ''
-        if(request.headers.cookie) {
-            request.headers.cookie.split('; ').forEach(cookie => {
-                let [key, value] = cookie.split('=')
-                if(key == 'session')
-                    authorization = value
-            })
-        }
-        return authorization
-    })()
+            let authorization = ''
+            if (request.headers.cookie) {
+                request.headers.cookie.split(';').forEach(cookie => {
+                    let [key, value] = cookie.trim().split('=')
+                    if (key === 'session')
+                        authorization = value
+                })
+            }
+            return authorization
+        })()
 }
 
 class Server extends _Server {
@@ -24,9 +24,9 @@ class Server extends _Server {
         super(options)
 
         // When the server is listening
-        this.http.on('listening', () => {
-            console.log(`Server is listening on ${this.options.hostname}:${this.options.port}`)
-        })
+        // this.http.on('listening', () => {
+        //     console.log(`Server is listening on ${this.options.hostname}:${this.options.port}`)
+        // })
 
         // When the server gets a HTTP request
         this.http.on('request', (request, response) => {
@@ -68,7 +68,7 @@ class Server extends _Server {
 
         application.initiate(authorization).then(() => {
 
-            if(socket) {
+            if (socket) {
 
                 response.on('message', message => {
 
@@ -111,7 +111,7 @@ class Server extends _Server {
 
             console.log(error)
 
-            if(socket) {
+            if (socket) {
 
                 response.send('Error')
                 response.terminate()
@@ -125,6 +125,7 @@ class Server extends _Server {
         })
 
     }
+
     process({application, request, socket}) {
 
         let promise = Promise.resolve(request)
@@ -156,7 +157,7 @@ class Server extends _Server {
 
 
         // Pipe
-        if(socket)
+        if (socket)
 
             promise.then(pipe => {
 

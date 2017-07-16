@@ -1,8 +1,6 @@
-
-
 const build = (object, properties) => {
 
-        for(let key of Object.keys(properties))
+        for (let key of Object.keys(properties))
 
             switch (properties[key].name || properties[key].constructor.name) {
 
@@ -27,23 +25,22 @@ const build = (object, properties) => {
             }
 
     },
-    bind = (object, values, types, trackChange = false, changes = [], errors = {}, preKey) => {
+    bind = (object, values, types, trackChange = false, changes = new Set(), errors = {}, preKey) => {
         return Promise.all(
-
             Object.keys(values).map(key => new Promise((resolve, reject) => {
 
                 // if the key exists in types
-                if(typeof types[key] != 'undefined')
+                if (typeof types[key] !== 'undefined')
 
-                    // if the type has a load function
-                    if(typeof types[key].load == 'function')
+                // if the type has a load function
+                    if (typeof types[key].load === 'function')
 
-                        // load it
+                    // load it
                         types[key].load(values[key]).then(value => {
 
-                            if(trackChange)
+                            if (trackChange)
 
-                                changes.push(`${preKey ? preKey+'.' : ''}${key}`)
+                                changes.add(`${preKey ? preKey + '.' : ''}${key}`)
 
                             object[key] = value
 
@@ -58,7 +55,7 @@ const build = (object, properties) => {
 
                             case 'Object':
 
-                                bind(object[key], values[key], types[key], trackChange, changes, errors, `${preKey ? preKey+'.' : ''}${key}`).then(resolve).catch(reject)
+                                bind(object[key], values[key], types[key], trackChange, changes, errors, `${preKey ? preKey + '.' : ''}${key}`).then(resolve).catch(reject)
 
                                 break
 
@@ -69,22 +66,21 @@ const build = (object, properties) => {
                                 object[key] = []
 
                                 Promise.all(
-
                                     (values[key] || []).map((value, i) => new Promise((resolve, reject) => {
 
-                                        if(typeof type.load == 'function')
+                                        if (typeof type.load === 'function')
 
                                             type.load(value).then(loadedValue => {
 
-                                                if(trackChange)
+                                                if (trackChange)
 
-                                                    changes.push(`${preKey ? preKey+'.' : ''}${key}.${i}`)
+                                                    changes.add(`${preKey ? preKey + '.' : ''}${key}.${i}`)
 
                                                 resolve(loadedValue)
 
                                             }).catch(reject)
 
-                                        else if(type.constructor.name == 'Object') {
+                                        else if (type.constructor.name === 'Object') {
 
                                             let newValue = {}
 
@@ -98,9 +94,9 @@ const build = (object, properties) => {
 
                                         } else {
 
-                                            if(trackChange)
+                                            if (trackChange)
 
-                                                changes.push(`${preKey ? preKey+'.' : ''}${key}.${i}`)
+                                                changes.add(`${preKey ? preKey + '.' : ''}${key}.${i}`)
 
 
                                             resolve(new type(value))
@@ -108,7 +104,6 @@ const build = (object, properties) => {
                                         }
 
                                     }))
-
                                 ).then(values => {
 
                                     object[key] = values
@@ -125,9 +120,9 @@ const build = (object, properties) => {
 
                                     object[key] = new types[key](values[key])
 
-                                    if(trackChange)
+                                    if (trackChange)
 
-                                        changes.push(`${preKey ? preKey+'.' : ''}${key}`)
+                                        changes.add(`${preKey ? preKey + '.' : ''}${key}`)
 
                                     resolve()
 
@@ -145,17 +140,7 @@ const build = (object, properties) => {
 
                     resolve()
             }))
-
-        ).then(() => new Promise(resolve => {
-
-            resolve({
-                changed: changes.length ? true : false,
-                changes,
-                erred: Object.keys(errors).length ? true : false,
-                errors
-            })
-
-        }))
+        )
     }
 
 
@@ -165,13 +150,41 @@ class Entity {
 
         build(this, this.constructor.properties)
 
+        let changes = new Set(),
+            errors = {}
+
+        this.getChanges = () => changes
+        this.isChanged = (key) => key ? changes.has(key) : !!changes.size
+        this.setChange = (key) => changes.add(key)
+
+        this.getErrors = () => errors
+        this.isErred = (key) => key ? errors.hasOwnProperty(key) : !!Object.keys(errors).length
+        this.setError = (key, error) => errors[key] = error
+        this.getError = (key) => errors[key]
+
+        this.getBind = () => {
+            return {
+                changed: this.isChanged(),
+                changes: this.getChanges(),
+                erred: this.isErred(),
+                errors: this.getErrors()
+            }
+        }
+
     }
 
     bind(data, change = true) {
 
-        return bind(this, data, this.constructor.properties, change).then(bind => new Promise(resolve => {
+        return bind(
+            this,
+            data,
+            this.constructor.properties,
+            change,
+            this.getChanges(),
+            this.getErrors()
+        ).then(() => new Promise(resolve => {
 
-            resolve(bind)
+            resolve(this.getBind())
 
         }))
 
@@ -183,7 +196,7 @@ class Entity {
 
     bindAndSave(data) {
 
-        return this.bind(data).then(bind => {
+        return this.bind(data).then(() => {
             return this.save()
         })
 
