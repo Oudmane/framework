@@ -66,6 +66,8 @@ class Server extends _Server {
             response
         }
 
+        application.socket = socket
+
         application.initiate(authorization).then(() => {
 
             if (socket) {
@@ -151,7 +153,7 @@ class Server extends _Server {
         // Render
         promise = promise.then(payload => new Promise((resolve, reject) => {
 
-            application.render(payload, socket).then(resolve)
+            application.render(payload).then(resolve)
 
         }))
 

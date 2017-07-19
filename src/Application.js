@@ -81,6 +81,8 @@ class Application {
             response: null
         }
 
+        this.socket = false
+
     }
 
     initiate(authorization) {
@@ -157,8 +159,8 @@ class Application {
         })
     }
 
-    render(payload, socket = false) {
-        return this.constructor.Renderer.render(payload, socket)
+    render(payload) {
+        return this.constructor.Renderer.render(payload, this)
     }
 
     static loadComponents(componentsDir) {
