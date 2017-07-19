@@ -26,7 +26,7 @@ class Renderer {
 
                         else {
 
-                            templates[template.name].render({body, status, headers, template}, application).then(resolve)
+                            templates[template.name || this.template].render({body, status, headers, template}, application).then(resolve)
 
                         }
 
@@ -89,6 +89,11 @@ class Renderer {
             resolve(templates)
 
         })
+    }
+    static getTemplate(template = '') {
+
+        return Promise.resolve(templates[template || this.template])
+
     }
 }
 

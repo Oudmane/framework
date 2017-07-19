@@ -5,6 +5,7 @@ import multipart from 'parse-multipart'
 
 class Request {
     constructor(request, socket = false) {
+        this.id = ''
         this.parseURL(request.url)
         this.method = request.method
         this.headers = request.headers
@@ -56,6 +57,7 @@ class Request {
 
     append(request) {
         this.method = request.method || 'GET'
+        this.id = request.id || ''
         this.parseURL(request.url)
         this.parseBody(request.data || {}, 'object')
     }

@@ -195,6 +195,25 @@ class Application {
             resolve(components)
         })
     }
+    static loadModules(modulesDir) {
+        return new Promise(resolve => {
+            modules = {}
+            fs.readdirSync(modulesDir).forEach(module => {
+                let moduleDir = path.join(modulesDir, module)
+                if(fs.statSync(moduleDir).isDirectory()) {
+                    let controllerFile = path.join(moduleDir, 'controller.js')
+                    if(fs.existsSync(controllerFile))
+                        modules[module] = require(controllerFile).default
+                }
+            })
+            resolve(modules)
+        })
+    }
+    static getModule(module) {
+        return new Promise(resolve => {
+            resolve(modules[module])
+        })
+    }
 }
 
 Application.routes = []
