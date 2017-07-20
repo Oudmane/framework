@@ -76,11 +76,10 @@ class Entity extends _Entity {
                             next()
                     })
                 }).then(() => {
-                    // if(isNew)
-                    //     this.constructor.emit('new', this)
-                    // else
-                    //     this.constructor.emit('edit', this)
-                    // this.constructor.emit('save', this, isNew)
+
+                    this.constructor.emit(isNew ? 'new' : 'edit', this)
+
+                    this.constructor.emit('save', this, isNew)
 
                     resolve()
                 })

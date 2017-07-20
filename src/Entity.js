@@ -1,3 +1,5 @@
+import EventEmitter from 'events'
+
 const build = (object, properties) => {
 
         for (let key of Object.keys(properties))
@@ -141,7 +143,8 @@ const build = (object, properties) => {
                     resolve()
             }))
         )
-    }
+    },
+    events = new EventEmitter()
 
 
 class Entity {
@@ -240,6 +243,16 @@ class Entity {
 
         return object
 
+    }
+
+    static on() {
+        events.on.apply(this, arguments)
+    }
+    static once() {
+        events.once.apply(this, arguments)
+    }
+    static emit() {
+        events.emit.apply(this, arguments)
     }
 
 }
