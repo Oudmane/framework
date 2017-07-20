@@ -119,11 +119,7 @@ class Application {
     load(route) {
         return new Promise((resolve, reject) => {
 
-            let {
-                    component,
-                    task
-                } = route,
-                _payload = {}
+            let _payload = {}
 
             trigger('beforeLoad', [this, route, _payload]).then(
                 () => {
@@ -133,14 +129,14 @@ class Application {
                         if (!components)
                             reject('Components unloaded')
 
-                        else if (!components[component])
+                        else if (!components[route.component])
                             reject('Component not found')
 
-                        else if (!components[component][task])
+                        else if (!components[route.component][route.task])
                             reject('task not found')
 
                         else
-                            components[component][task].run(this, route, _payload).then(payload => {
+                            components[route.component][route.task].run(this, route, _payload).then(payload => {
 
                                 resolve(_payload = Object.assign(_payload, payload))
 
