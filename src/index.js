@@ -4,6 +4,7 @@ import Entity from './Entity'
 import Redis from './Redis'
 import MongoDB from './MongoDB'
 import Helper from './Helper'
+import ElasticSearch from './ElasticSearch'
 
 export {
     Server,
@@ -11,5 +12,6 @@ export {
     Entity,
     Redis,
     MongoDB,
-    Helper
+    Helper,
+    ElasticSearch
 }
