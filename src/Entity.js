@@ -202,6 +202,46 @@ class Entity {
 
     }
 
+    map(map) {
+
+        let object = {}
+
+        map.forEach(property => {
+
+            switch (typeof property) {
+
+                case 'string':
+
+                    object[property] = this[property]
+
+                    break
+
+                case 'object':
+
+                    let {
+                            key,
+                            map
+                        } = property,
+                        value = {}
+
+                    map.split('.').forEach(key => {
+
+                        value = value[key] || this[key]
+
+                    })
+
+                    object[key] = value
+
+                    break
+            }
+
+        })
+
+
+        return object
+
+    }
+
 }
 
 Entity.properties = {}
