@@ -1,5 +1,6 @@
 import _Entity from '../Entity'
 import MongoDB from  '../MongoDB'
+import _ from 'lodash'
 
 const objectKeys = (object, columns) => {
 
@@ -8,21 +9,27 @@ const objectKeys = (object, columns) => {
     if (typeof columns === 'undefined')
         columns = Object.keys(object.constructor.properties || object)
 
-    for (let key of columns)
+    for (let key of columns) {
 
-        if (object[key] === null)
-            sObject[key] = object[key]
+        console.log(key)
 
-        else if (object[key].constructor.name === 'Object')
-            sObject[key] = objectKeys(object[key])
+        if (_.get(object, key) === null)
+            sObject[key] = _.get(object, key)
 
-        else if (object[key].constructor.name === 'Array')
-            sObject[key] = object[key].map(element => {
+        else if (_.get(object, key).constructor.name === 'Object')
+            sObject[key] = objectKeys(_.get(object, key))
+
+        else if (_.get(object, key).constructor.name === 'Array')
+            sObject[key] = _.get(object, key).map(element => {
                 return element.valueOf()
             })
 
         else
-            sObject[key] = object[key].valueOf()
+            sObject[key] = _.get(object, key).valueOf()
+
+    }
+
+    console.log(2)
 
     return sObject
 
@@ -42,30 +49,34 @@ class Entity extends _Entity {
 
             columns.delete('id')
 
-            Array.from(columns).reduce((promise, key) => {
+            // Array.from(columns).reduce((promise, key) => {
+            //
+            //     console.log(key)
+            //
+            //     if (typeof this[key].save === 'function')
+            //         return promise.then(() => new Promise(next => {
+            //             this[key].save().then(next)
+            //         }))
+            //
+            //     else if (this[key].constructor.name === 'Array')
+            //         return promise.then(() => this[key].reduce((promise, property) => promise.then(() => new Promise(saved => {
+            //             if (typeof property.save === 'function')
+            //                 property.save().then(() => {
+            //                     saved()
+            //                 })
+            //             else
+            //                 saved()
+            //         })), Promise.resolve()))
+            //
+            //     else
+            //         return promise
+            //
+            // }, Promise.resolve()).then(() => {
 
-                if (typeof this[key].save === 'function')
-                    return promise.then(() => new Promise(next => {
-                        this[key].save().then(next)
-                    }))
-
-                else if (this[key].constructor.name === 'Array')
-                    return promise.then(() => this[key].reduce((promise, property) => promise.then(() => new Promise(saved => {
-                        if (typeof property.save === 'function')
-                            property.save().then(() => {
-                                saved()
-                            })
-                        else
-                            saved()
-                    })), Promise.resolve()))
-
-                else
-                    return promise
-
-            }, Promise.resolve()).then(() => {
                 let collection = MongoDB.database.collection(this.constructor.collection),
                     document = objectKeys(this, columns),
                     task = isNew ? collection.insertOne(document) : collection.updateOne({_id: new MongoDB.ObjectID(this.id.toString())}, {$set: document})
+
                 task.then((result) => {
                     return new Promise(next => {
                         if (result.insertedId)
@@ -81,7 +92,7 @@ class Entity extends _Entity {
 
                     resolve()
                 })
-            }).catch(reject)
+            // }).catch(reject)
 
         })
     }
