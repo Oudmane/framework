@@ -1,5 +1,5 @@
 import URL from 'url'
-import qs from 'querystring'
+import qs from 'qs'
 import cookie from 'cookie'
 import multipart from 'parse-multipart'
 

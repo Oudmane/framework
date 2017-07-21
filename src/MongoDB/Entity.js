@@ -38,13 +38,11 @@ class Entity extends _Entity {
 
         return new Promise((resolve, reject) => {
 
-            let columns = isNew ? Object.keys(this.constructor.properties) : this.getChanges(),
-                id = columns.indexOf('id')
+            let columns = isNew ? new Set(Object.keys(this.constructor.properties)) : this.getChanges()
 
-            if (id > -1)
-                columns.splice(id, 1)
+            columns.delete('id')
 
-            columns.reduce((promise, key) => {
+            Array.from(columns).reduce((promise, key) => {
 
                 if (typeof this[key].save === 'function')
                     return promise.then(() => new Promise(next => {
