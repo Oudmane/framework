@@ -11,8 +11,6 @@ const objectKeys = (object, columns) => {
 
     for (let key of columns) {
 
-        console.log(key)
-
         if (_.get(object, key) === null)
             sObject[key] = _.get(object, key)
 
@@ -28,8 +26,6 @@ const objectKeys = (object, columns) => {
             sObject[key] = _.get(object, key).valueOf()
 
     }
-
-    console.log(2)
 
     return sObject
 
@@ -49,29 +45,27 @@ class Entity extends _Entity {
 
             columns.delete('id')
 
-            // Array.from(columns).reduce((promise, key) => {
-            //
-            //     console.log(key)
-            //
-            //     if (typeof this[key].save === 'function')
-            //         return promise.then(() => new Promise(next => {
-            //             this[key].save().then(next)
-            //         }))
-            //
-            //     else if (this[key].constructor.name === 'Array')
-            //         return promise.then(() => this[key].reduce((promise, property) => promise.then(() => new Promise(saved => {
-            //             if (typeof property.save === 'function')
-            //                 property.save().then(() => {
-            //                     saved()
-            //                 })
-            //             else
-            //                 saved()
-            //         })), Promise.resolve()))
-            //
-            //     else
-            //         return promise
-            //
-            // }, Promise.resolve()).then(() => {
+            Array.from(columns).reduce((promise, key) => {
+
+                if (typeof _.get(this, key).save === 'function')
+                    return promise.then(() => new Promise(next => {
+                        _.get(this, key).save().then(next)
+                    }))
+
+                else if (_.get(this, key).constructor.name === 'Array')
+                    return promise.then(() => _.get(this, key).reduce((promise, property) => promise.then(() => new Promise(saved => {
+                        if (typeof property.save === 'function')
+                            property.save().then(() => {
+                                saved()
+                            })
+                        else
+                            saved()
+                    })), Promise.resolve()))
+
+                else
+                    return promise
+
+            }, Promise.resolve()).then(() => {
 
                 let collection = MongoDB.database.collection(this.constructor.collection),
                     document = objectKeys(this, columns),
@@ -92,7 +86,7 @@ class Entity extends _Entity {
 
                     resolve()
                 })
-            // }).catch(reject)
+            }).catch(reject)
 
         })
     }
