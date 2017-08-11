@@ -30,6 +30,7 @@
     "parse-multipart": "^1.0.4"
   },
   "dependencies": {
+    "cron": "^1.2.1",
     "elasticsearch": "^13.2.0",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.30",
