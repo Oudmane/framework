@@ -92,7 +92,7 @@ class Entity extends _Entity {
     }
 
     valueOf() {
-        return new MongoDB.ObjectID(this.id.toString())
+        return this.id.toString() ? new MongoDB.ObjectID(this.id.toString()) : ''
     }
 
     static load(query) {
