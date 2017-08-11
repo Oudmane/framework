@@ -5,6 +5,7 @@ import Redis from './Redis'
 import MongoDB from './MongoDB'
 import Helper from './Helper'
 import ElasticSearch from './ElasticSearch'
+import CronJob from './CronJob'
 
 export {
     Server,
@@ -13,5 +14,6 @@ export {
     Redis,
     MongoDB,
     Helper,
-    ElasticSearch
+    ElasticSearch,
+    CronJob
 }
