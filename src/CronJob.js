@@ -4,7 +4,8 @@ import {
 import EventEmitter from 'events'
 
 let jobs = {},
-    events = new EventEmitter()
+    events = new EventEmitter(),
+    promise = Promise.resolve()
 
 class CronJob {
     static start(id, cronTime, task, data, timeZone = 'Universal') {
@@ -36,6 +37,9 @@ class CronJob {
     }
     static emit() {
         events.emit.apply(this, arguments)
+    }
+    static pushPromise(nextPromise) {
+        promise = promise.then(nextPromise)
     }
 }
 
