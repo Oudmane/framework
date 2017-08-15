@@ -25,7 +25,7 @@ class Request {
         this.path = url.pathname
         this.query = url.search.replace(/^\?/, '')
         this.files = []
-        this.pathArray = url.pathname.replace(/^\//, '').split('/')
+        this.pathArray = (url.pathname || '').replace(/^\//, '').split('/')
         this.queryObject = url.query
     }
 
