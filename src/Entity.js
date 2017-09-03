@@ -110,6 +110,8 @@ const build = (object, properties) => {
 
                                     object[key] = values
 
+                                    changes.add(`${preKey ? preKey + '.' : ''}${key}`)
+
                                     resolve()
 
                                 }).catch(reject)
