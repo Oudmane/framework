@@ -110,7 +110,9 @@ const build = (object, properties) => {
 
                                     object[key] = values
 
-                                    changes.add(`${preKey ? preKey + '.' : ''}${key}`)
+                                    if(!values.length)
+
+                                        changes.add(`${preKey ? preKey + '.' : ''}${key}`)
 
                                     resolve()
 
