@@ -1,6 +1,6 @@
 {
   "name": "framework",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A framework to build robust API, and Web Apps",
   "main": "lib/index.js",
   "scripts": {
