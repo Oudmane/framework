@@ -1,5 +1,5 @@
 {
-  "name": "framework",
+  "name": "@oudyworks/framework",
   "version": "1.0.4",
   "description": "A framework to build robust API, and Web Apps",
   "main": "lib/index.js",
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Oudmane/framework.git"
+    "url": "git+https://github.com/OudyWorks/framework.git"
   },
   "keywords": [
     "framework",
@@ -19,9 +19,9 @@
   "author": "Ayoub Oudmane <ayoub@oudmane.me>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Oudmane/framework/issues"
+    "url": "https://github.com/OudyWorks/framework/issues"
   },
-  "homepage": "https://github.com/Oudmane/framework#readme",
+  "homepage": "https://github.com/OudyWorks/framework#readme",
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
@@ -37,5 +37,8 @@
     "qs": "^6.5.0",
     "redis": "^2.8.0",
     "ws": "^3.1.0"
+  },
+  "directories": {
+    "lib": "lib"
   }
 }
