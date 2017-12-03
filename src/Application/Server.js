@@ -97,7 +97,7 @@ class Server extends _Server {
 
                 request.on('end', () => {
 
-                    appRequest.parseBody(Buffer.concat(body).toString(), request.headers['content-type'])
+                    appRequest.parseBody(Buffer.concat(body), request.headers['content-type'])
 
                     this.process({
                         application,

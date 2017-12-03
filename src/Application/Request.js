@@ -35,19 +35,19 @@ class Request {
         switch (typeArray[0]) {
             case 'application/json':
             case 'json':
-                this.bodyObject = JSON.parse(body)
+                this.bodyObject = JSON.parse(body.toString())
                 break
             case 'object':
                 Object.assign(this.bodyObject, body)
                 break
             case 'application/x-www-form-urlencoded':
             default:
-                this.bodyObject = qs.parse(body)
+                this.bodyObject = qs.parse(body.toString())
                 break
             case 'multipart/form-data':
                 try {
                     let boundary = multipart.getBoundary(type)
-                    this.files = multipart.Parse(Buffer.from(body, 'utf8'), boundary)
+                    this.files = multipart.Parse(body, boundary)
                 } catch (e) {
                     this.files = []
                 }
