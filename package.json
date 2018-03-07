@@ -1,6 +1,6 @@
 {
   "name": "@oudyworks/framework",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A framework to build robust API, and Web Apps",
   "main": "lib/index.js",
   "scripts": {
