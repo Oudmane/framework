@@ -23,7 +23,7 @@ class Request {
         url = URL.parse(url, true)
         this.uri = url.path
         this.path = url.pathname
-        this.query = url.search.replace(/^\?/, '')
+        this.query = (url.search || '').replace(/^\?/, '')
         this.files = []
         this.pathArray = (url.pathname || '').replace(/^\//, '').split('/')
         this.queryObject = url.query
